@@ -1,11 +1,11 @@
-FROM golang:latest AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
 
 COPY . .
-RUN go mod init fullcycle && go build -o fullcycle .
+RUN go mod init fullcycle && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o fullcycle .
 
-FROM golang:latest AS final
+FROM alpine
 WORKDIR /app
 COPY --from=builder /app/fullcycle .
 CMD ["./fullcycle"]
